@@ -6,40 +6,29 @@ const transmitter = (options, originalCB) => {
 		toggle,
 	} = options;
 	let chars = message.split('');
+	let codeLength = [];
 
-	const processMorse = (item, callback) => {
+	const updateChars = () => chars.shift();
+	const updateCodeLength = () => codeLength.shift();
+
+	const sendMessage = item => {
 		let lengths = 1;
 		if ( item === '.' ) {
 			lengths = 1;
 		}
-		console.log(timeouter);
-		return timeouter(() => {
-			console.log(item);
+		timeouter(() => {
 			toggle();
-			callback();
-		}, 1);
+			updateCodeLength();
+		}, lengths);
 	}
 
 	const processChar = (char) => {
-		const charCode = codes[char];
-		//var p = Promise.resolve();
-//
-		//charCode.split('').forEach(function(item){
-		//	p = p.then(function(){ return processMorse(item); });
-		//});
-		//return p.then(promise => {
-		//	console.log( promise);
-	//	});
-		//const promiseResult = Promise.resolve(charCode.split('')).each(processMorse);
-		//return Promise.all( p ).then(values => {
-		//	console.log( values);
-		//	resolve(values);
-		//}, reason => {
-		//	console.log(reason)
-		//});
+		codeLength = codes[char].split('');
+		while (codeLength.length) {
+			sendMessage(chars[0]);
+		}
+		updateChars();
 	}
-
-	const updateChars = () => chars.shift();
 
 	const processMessage = prev => {
 		let result = '';
@@ -49,33 +38,11 @@ const transmitter = (options, originalCB) => {
 			processChar(chars[0]);
 		}
 
-		//chars.forEach(function(char){
-		//	p = p.then(function(){
-		//		const charCode = codes[char];
-		//		return timeouter(() => {
-		//			console.log(item);
-		//			toggle();
-		//		}, 1)
-		//	});
-		//});
-
-		//chars.forEach(function(char){
-		//	p = p.then(function(){ return processChar(char); });
-		//});
-
-		//chars.map( char => {
-		//	promiseResult.push( new Promise((resolve, reject) => {
-		//		return processChar(char, resolve);
-		//	}) );
-		//} );
-		//return p.then(values => {
-		//	console.log('attheend');
 		originalCB();
-		//});
 	}
 
 	toggle();
-	processMessage();
+	processNode();
 };
 
 module.exports = transmitter;
