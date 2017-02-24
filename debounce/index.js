@@ -1,8 +1,7 @@
 const debounce = (callback, timeout) => {
-	// I'm running node5.12 because. Please don't hate
-	var cur = null;
+	let cur = null;
 
-	// Return a new function so our scope is defined
+	// Make sure our scope is contained
 	return function() {
 		const definedCallback = () => {
 			// Modify the context, then reset
