@@ -1,48 +1,62 @@
 const transmitter = (options, originalCB) => {
+	const handler = {
+		set(target, key, value) {
+			target[key] = value;
+			processMessage(value);
+		},
+	};
+
+	const otherHandler = {
+		set(target, key, value) {
+			if ( key === 'length' && !value ) {
+				target[key] = value;
+				updateChars();
+				return true;
+			}
+			target[key] = value;
+			processChar();
+			return true;
+		},
+	};
+
 	const {
 		codes,
 		message,
 		timeouter,
 		toggle,
 	} = options;
-	let chars = message.split('');
-	let codeLength = [];
+	let chars = new Proxy(message.split(''), handler);
+	let codeLength = [];//= new Proxy([], otherHandler);
+	let curLoop = codeLength.length
 
 	const updateChars = () => chars.shift();
 	const updateCodeLength = () => codeLength.shift();
 
-	const sendMessage = item => {
-		let lengths = 1;
-		if ( item === '.' ) {
-			lengths = 1;
-		}
-		timeouter(() => {
+	const sendMessage = (item, length = 1) => {
+		const lengths = item === '.' ? 1 : item === '-' ? 3 : length;
+		timeouter(function() {
 			toggle();
 			updateCodeLength();
 		}, lengths);
 	}
 
-	const processChar = (char) => {
-		codeLength = codes[char].split('');
-		while (codeLength.length) {
-			sendMessage(chars[0]);
-		}
-		updateChars();
+	const processChar = (option = codeLength[0]) => {
+		if (codeLength.length === curLoop) return;
+		curLoop = codeLength.length
+		sendMessage(option);
 	}
 
 	const processMessage = prev => {
-		let result = '';
-		let promiseResult = [];
-
-		while (chars.length) {
-			processChar(chars[0]);
+		if (codeLength.length !== curLoop) {
+			sendMessage('', 1);
 		}
-
-		originalCB();
+		if (!chars.length) originalCB();
+		codeLength = new Proxy(codes[chars[0]].split(''), otherHandler);
+		processChar();
 	}
 
 	toggle();
-	processNode();
+	processMessage();
 };
 
 module.exports = transmitter;
