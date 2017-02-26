@@ -22,7 +22,6 @@ const transmitter = (options, originalCB) => {
 		const item = curCodes.shift();
 		var callback = function() {
 			if (curCodes.length > 0) {
-				//if there's more to the code, add a dot after
 				sendMessage('', 1, () => processCurCode() );
 			} else {
 				processCurCode();
@@ -35,11 +34,14 @@ const transmitter = (options, originalCB) => {
 	// Process a single letter
 	const processMessage = prev => {
 		if (!letters.length) return originalCB();
-		curCodes = codes[letters.shift()].split('');
-		if (prev) {
+		const current = letters.shift();
+		if (current === ' ') {
+			return sendMessage('', 7, () => processMessage(true) );
+		}
+		curCodes = codes[current].split('');
+		if (prev && prev !== ' ') {
 			return sendMessage('', 3, () => processCurCode() );
 		}
-		// Will do more when ther are more characters to process
 		processCurCode(curCodes);
 	}
 
