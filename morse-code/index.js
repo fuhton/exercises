@@ -18,7 +18,7 @@ const transmitter = (options, originalCB) => {
 	}
 
 	const processCurCode = () => {
-		if (!curCodes.length) return processMessage();
+		if (!curCodes.length) return processMessage(true);
 		const item = curCodes.shift();
 		var callback = function() {
 			if (curCodes.length > 0) {
@@ -36,6 +36,9 @@ const transmitter = (options, originalCB) => {
 	const processMessage = prev => {
 		if (!letters.length) return originalCB();
 		curCodes = codes[letters.shift()].split('');
+		if (curCodes != ' ' && prev && prev !== ' ') {
+			return sendMessage('', 3, () => processCurCode() );
+		}
 		// Will do more when ther are more characters to process
 		processCurCode(curCodes);
 	}
