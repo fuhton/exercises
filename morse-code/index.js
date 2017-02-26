@@ -39,10 +39,10 @@ const transmitter = (options, originalCB) => {
 			return sendMessage('', 7, () => processMessage(true) );
 		}
 		curCodes = codes[current].split('');
-		if (prev && prev !== ' ') {
+		if (current !== ' ' && prev) {
 			return sendMessage('', 3, () => processCurCode() );
 		}
-		processCurCode(curCodes);
+		processCurCode();
 	}
 
 	toggle();
