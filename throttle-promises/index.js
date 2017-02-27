@@ -1,10 +1,10 @@
 const throttlePromises = (limit, data) => {
 	const results = [];
-	const promises = data.map((p, i) => ({
+	const promises = data.map((el, i) => ({
 		haveRun: false,
 		then(resolve) {
 			this.haveRun = true;
-			p().then(res => {
+			el().then(res => {
 				results[i] = res;
 				resolve(res);
 			});
@@ -26,8 +26,8 @@ const throttlePromises = (limit, data) => {
 			}
 		};
 
-		promises.slice(0, limit).map(promise => {
-			Promise.resolve(promise).then(runNext);
+		promises.slice(0, limit).map(el => {
+			Promise.resolve(el).then(runNext);
 		});
 	});
 };
