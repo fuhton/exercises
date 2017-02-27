@@ -36,10 +36,10 @@ const transmitter = (options, originalCB) => {
 		if (!letters.length) return originalCB();
 		const current = letters.shift();
 		if (current === ' ') {
-			return sendMessage('', 7, () => processMessage(true) );
+			return sendMessage('', 7, () => processMessage(' ') );
 		}
 		curCodes = codes[current].split('');
-		if (current !== ' ' && prev) {
+		if (current !== ' ' && prev && prev !== ' ') {
 			return sendMessage('', 3, () => processCurCode() );
 		}
 		processCurCode();
