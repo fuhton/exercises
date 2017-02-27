@@ -1,47 +1,33 @@
-const transmitter = (options, originalCB) => {
-	const {
-		codes,
-		message,
-		timeouter,
-		toggle,
-	} = options;
-	let letters = message.split('');
+const transmitter = (options, originalCallback) => {
+	const { codes, message, timeouter, toggle } = options;
+	let curChar = message.split('');
 	let curCodes = [];
-	let curLoop = curCodes.length
 
-	const sendMessage = (item, length = 1, callback) => {
-		const lengths = item === '.' ? 1 : item === '-' ? 3 : length;
-		timeouter(function() {
+	const sendToggle = (length, callback = defaultToggleCallback) => {
+		timeouter(() => {
 			toggle();
 			callback();
-		}, lengths);
+		}, length);
 	}
+
+	const defaultToggleCallback = () => {
+		if (curCodes.length) return sendToggle(1, processCurCode);
+		return processCurCode();
+	};
 
 	const processCurCode = () => {
 		if (!curCodes.length) return processMessage(true);
-		const item = curCodes.shift();
-		var callback = function() {
-			if (curCodes.length > 0) {
-				sendMessage('', 1, () => processCurCode() );
-			} else {
-				processCurCode();
-			}
-		};
-
-		return sendMessage(item, 1, callback);
+		// Only testing two outcomes here anyway...
+		return sendToggle(curCodes.shift() === '.' ? 1 : 3);
 	}
 
-	// Process a single letter
+	// Order is intentional here
 	const processMessage = prev => {
-		if (!letters.length) return originalCB();
-		const current = letters.shift();
-		if (current === ' ') {
-			return sendMessage('', 7, () => processMessage(' ') );
-		}
+		if (!curChar.length) return originalCallback();
+		const current = curChar.shift();
+		if (current === ' ') return sendToggle(7, processMessage);
 		curCodes = codes[current].split('');
-		if (current !== ' ' && prev && prev !== ' ') {
-			return sendMessage('', 3, () => processCurCode() );
-		}
+		if (prev) return sendToggle(3, processCurCode);
 		processCurCode();
 	}
 
