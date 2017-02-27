@@ -25,16 +25,15 @@ const update = (state, mods) => {
 	if (!!mods[set]) {
 		return mods[set];
 	}
-
 	let newState = shallowCopy(state);
 
 	if (!!mods[merge]) Object.assign(newState, mods[merge]);
-	if (!!mods[push]) mods[push].forEach( item => newState.push(item) );
-	if (!!mods[unshift]) mods[unshift].forEach( item => newState.unshift(item) );
-	if (!!mods[splice]) mods[splice].forEach( item => newState.splice.apply(newState, item) );
+	if (!!mods[push]) mods[push].forEach(item => newState.push(item));
+	if (!!mods[unshift]) mods[unshift].forEach(item => newState.unshift(item));
+	if (!!mods[splice]) mods[splice].forEach(item => newState.splice.apply(newState, item));
 	if (!!mods[apply]) newState = mods[apply](newState);
 
-	Object.keys(mods).map( k => {
+	Object.keys(mods).map(k => {
 		if (!(avilCommands.hasOwnProperty(k) && avilCommands[k])) {
 			newState[k] = update(state[k], mods[k]);
 		}
